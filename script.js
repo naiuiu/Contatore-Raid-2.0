@@ -1,4 +1,4 @@
-const tipiScheggia = ['mystery', 'ancient', 'void', 'sacred', 'primal'];
+const tipiScheggia = ['ancient', 'void', 'sacred', 'primal'];
 const rarita = ['raro', 'epico', 'leggendario', 'mitico'];
 
 // Dati: totale conteggio e conteggio senza rarità specifica (per mercy)
