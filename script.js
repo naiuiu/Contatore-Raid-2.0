@@ -1,61 +1,61 @@
 const tipiScheggia = ['mystery', 'ancient', 'void', 'sacred', 'primal'];
 const rarita = ['raro', 'epico', 'leggendario', 'mitico'];
 
+// Dati: totale conteggio e conteggio senza rarità specifica (per mercy)
 const dati = {};
 const datiAnnuali = {};
 
 // Inizializza dati e datiAnnuali
 tipiScheggia.forEach(tipo => {
-  dati[tipo] = { totale: 0, raro: 0, epico: 0, leggendario: 0, mitico: 0 };
+  dati[tipo] = {
+    totale: 0,
+    raro: 0, epico: 0, leggendario: 0, mitico: 0,
+    senzaEpico: 0, senzaLeggendario: 0, senzaMitico: 0
+  };
   datiAnnuali[tipo] = { totale: 0, raro: 0, epico: 0, leggendario: 0, mitico: 0 };
 });
 
 // Aggiunge una scheggia del tipo e rarità scelti
 function add(rar) {
   const tipo = document.getElementById("tipo").value;
-  dati[tipo][rar]++;
-  aggiornaTotale(tipo);
-  datiAnnuali[tipo][rar]++;
+  console.log(`Aggiungo rarità ${rar} per scheggia ${tipo}`);
+
+  // Aumenta totale
+  dati[tipo].totale++;
   datiAnnuali[tipo].totale++;
 
-  controlloMercy(tipo, rar);
+  // Incrementa rarità scelta
+  dati[tipo][rar]++;
+  datiAnnuali[tipo][rar]++;
+
+  // Reset conteggi mercy se è stata trovata la rarità superiore
+  if (rar === 'epico') {
+    console.log('Reset senzaEpico');
+    dati[tipo].senzaEpico = 0;
+  } else {
+    dati[tipo].senzaEpico++;
+  }
+
+  if (rar === 'leggendario') {
+    console.log('Reset senzaLeggendario');
+    dati[tipo].senzaLeggendario = 0;
+  } else {
+    dati[tipo].senzaLeggendario++;
+  }
+
+  if (rar === 'mitico') {
+    console.log('Reset senzaMitico');
+    dati[tipo].senzaMitico = 0;
+  } else {
+    dati[tipo].senzaMitico++;
+  }
 
   mostra();
   mostraAnnuale();
   salvaDati();
 }
 
-function aggiornaTotale(tipo) {
-  dati[tipo].totale = rarita.reduce((sum, r) => sum + dati[tipo][r], 0);
-}
-
-function controlloMercy(tipo, rar) {
-  const d = dati[tipo];
-  const senzaEpico = d.totale - d.epico;
-  const senzaLegg = d.totale - d.leggendario;
-  const senzaMitico = d.totale - d.mitico;
-
-  if (rar === 'epico' && (tipo === 'ancient' || tipo === 'void')) {
-    if (senzaEpico >= 20) resetRarita(tipo, 'epico');
-  }
-  if (rar === 'leggendario') {
-    if ((tipo === 'ancient' || tipo === 'void') && senzaLegg >= 200) {
-      resetRarita(tipo, 'leggendario');
-    }
-    if (tipo === 'sacred' && senzaLegg >= 12) {
-      resetRarita(tipo, 'leggendario');
-    }
-    if (tipo === 'primal' && senzaLegg >= 75) {
-      resetRarita(tipo, 'leggendario');
-    }
-  }
-  if (rar === 'mitico' && tipo === 'primal') {
-    if (senzaMitico >= 200) {
-      resetRarita(tipo, 'mitico');
-    }
-  }
-}
-
+// Mostra i dati principali
 function mostra() {
   let out = '';
   tipiScheggia.forEach(tipo => {
@@ -72,6 +72,7 @@ function mostra() {
   creaBottoniReset();
 }
 
+// Mostra riepilogo annuale
 function mostraAnnuale() {
   let out = '';
   tipiScheggia.forEach(tipo => {
@@ -87,48 +88,60 @@ function mostraAnnuale() {
   document.getElementById("output-annuale").textContent = out || "Nessun dato annuale.";
 }
 
+// Calcola la percentuale
 function perc(val, tot) {
   return tot === 0 ? "0.00" : ((val / tot) * 100).toFixed(2);
 }
 
+// Calcola mercy come percentuale in base al conteggio senza la rarità superiore
 function calcolaMercy(tipo, rarita) {
   const d = dati[tipo];
-  const senzaEpico = d.totale - d.epico;
-  const senzaLegg = d.totale - d.leggendario;
-  const senzaMitico = d.totale - d.mitico;
 
   if (rarita === 'epico') {
     if (tipo === 'ancient' || tipo === 'void') {
-      return senzaEpico >= 20 ? '+' + ((senzaEpico - 20) * 2) + '%' : '—';
+      const count = d.senzaEpico;
+      if (count < 20) return '—';
+      return '+' + Math.min((count - 20) * 2, 100) + '%';
     }
     return '—';
   }
   if (rarita === 'leggendario') {
     if (tipo === 'ancient' || tipo === 'void') {
-      return senzaLegg >= 200 ? '+' + ((senzaLegg - 200) * 5) + '%' : '—';
+      const count = d.senzaLeggendario;
+      if (count < 200) return '—';
+      return '+' + Math.min((count - 200) * 5, 100) + '%';
     }
     if (tipo === 'sacred') {
-      return senzaLegg >= 12 ? '+' + ((senzaLegg - 12) * 2) + '%' : '—';
+      const count = d.senzaLeggendario;
+      if (count < 12) return '—';
+      return '+' + Math.min((count - 12) * 2, 100) + '%';
     }
     if (tipo === 'primal') {
-      return senzaLegg >= 75 ? '+' + ((senzaLegg - 75) * 1) + '%' : '—';
+      const count = d.senzaLeggendario;
+      if (count < 75) return '—';
+      return '+' + Math.min((count - 75) * 1, 100) + '%';
     }
     return '—';
   }
   if (rarita === 'mitico') {
     if (tipo === 'primal') {
-      return senzaMitico >= 200 ? '+' + ((senzaMitico - 200) * 10) + '%' : '—';
+      const count = d.senzaMitico;
+      if (count < 200) return '—';
+      return '+' + Math.min((count - 200) * 10, 100) + '%';
     }
     return '—';
   }
+
   return '—';
 }
 
+// Salva dati su localStorage
 function salvaDati() {
   localStorage.setItem("raidDatiV3", JSON.stringify(dati));
   localStorage.setItem("raidDatiAnnualiV3", JSON.stringify(datiAnnuali));
 }
 
+// Carica dati da localStorage
 function caricaDati() {
   const datiSalvati = localStorage.getItem("raidDatiV3");
   const datiAnnualiSalvati = localStorage.getItem("raidDatiAnnualiV3");
@@ -139,6 +152,9 @@ function caricaDati() {
         dati[tipo][r] = obj[tipo]?.[r] || 0;
       });
       dati[tipo].totale = obj[tipo]?.totale || 0;
+      dati[tipo].senzaEpico = obj[tipo]?.senzaEpico || 0;
+      dati[tipo].senzaLeggendario = obj[tipo]?.senzaLeggendario || 0;
+      dati[tipo].senzaMitico = obj[tipo]?.senzaMitico || 0;
     });
   }
   if (datiAnnualiSalvati) {
@@ -155,6 +171,7 @@ function caricaDati() {
   creaBottoniReset();
 }
 
+// Reset totale dati
 function resetta() {
   if (confirm("Sei sicura di voler azzerare tutti i dati delle schegge?")) {
     tipiScheggia.forEach(tipo => {
@@ -164,6 +181,9 @@ function resetta() {
       });
       dati[tipo].totale = 0;
       datiAnnuali[tipo].totale = 0;
+      dati[tipo].senzaEpico = 0;
+      dati[tipo].senzaLeggendario = 0;
+      dati[tipo].senzaMitico = 0;
     });
     salvaDati();
     mostra();
@@ -172,6 +192,7 @@ function resetta() {
   }
 }
 
+// Reset annuale
 function resetAnnuale() {
   if (confirm("Sei sicura di voler azzerare il riepilogo annuale?")) {
     tipiScheggia.forEach(tipo => {
@@ -185,6 +206,7 @@ function resetAnnuale() {
   }
 }
 
+// Reset singolo per tipo e rarità
 function resetRarita(tipo, rar) {
   dati[tipo][rar] = 0;
   aggiornaTotale(tipo);
@@ -194,6 +216,11 @@ function resetRarita(tipo, rar) {
   creaBottoniReset();
 }
 
+function aggiornaTotale(tipo) {
+  dati[tipo].totale = rarita.reduce((sum, r) => sum + dati[tipo][r], 0);
+}
+
+// Crea pulsanti reset per rarità singole
 function creaBottoniReset() {
   const container = document.getElementById('reset-rarita-container');
   container.innerHTML = '';
