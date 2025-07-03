@@ -1,0 +1,54 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  padding: 20px;
+}
+h1, h2 {
+  text-align: center;
+  color: gold;
+}
+.select-group, .btn-group, .reset, #riepilogo-annuale {
+  margin: 10px 0;
+  text-align: center;
+}
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  font-size: 16px;
+  background-color: #1f1f1f;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #333;
+}
+pre {
+  white-space: pre-wrap;
+  background: #111;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: monospace;
+}
+.reset button {
+  background-color: darkred;
+}
+.reset button:hover {
+  background-color: #b30000;
+}
+#reset-rarita-container {
+  margin: 10px 0;
+  text-align: center;
+}
+.reset-rarita-btn {
+  background-color: #444;
+  margin: 3px;
+  font-size: 14px;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+.reset-rarita-btn:hover {
+  background-color: #666;
+}

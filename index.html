@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAID Schegge Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>RAID Schegge Tracker</h1>
+
+  <div id="riepilogo-annuale">
+    <h2>Riepilogo Annuale</h2>
+    <pre id="output-annuale">Nessun dato annuale.</pre>
+    <button onclick="resetAnnuale()">Reset Riepilogo Annuale</button>
+  </div>
+
+  <div class="select-group">
+    <label for="tipo">Tipo scheggia:</label>
+    <select id="tipo">
+      <option value="mystery">Misteriosa</option>
+      <option value="ancient">Antica</option>
+      <option value="void">Vuoto</option>
+      <option value="sacred">Sacra</option>
+      <option value="primal">Primaria</option>
+    </select>
+  </div>
+
+  <div class="btn-group">
+    <button onclick="add('raro')">Raro</button>
+    <button onclick="add('epico')">Epico</button>
+    <button onclick="add('leggendario')">Leggendario</button>
+    <button onclick="add('mitico')">Mitico</button>
+  </div>
+
+  <pre id="output">Nessuna scheggia registrata.</pre>
+
+  <div id="reset-rarita-container"></div>
+
+  <div class="reset">
+    <button onclick="resetta()">Reset schegge</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registrato'))
+        .catch(err => console.error('Service Worker non registrato', err));
+    }
+  </script>
+</body>
+</html>
