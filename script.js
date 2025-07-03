@@ -18,7 +18,7 @@ tipiScheggia.forEach(tipo => {
 // Aggiunge una scheggia del tipo e rarità scelti
 function add(rar) {
   const tipo = document.getElementById("tipo").value;
-  console.log(`Aggiungo rarità ${rar} per scheggia ${tipo}`);
+  console.log(`Tentativo di aggiungere ${rar} per scheggia ${tipo}`);
 
   // Aumenta totale
   dati[tipo].totale++;
@@ -27,8 +27,9 @@ function add(rar) {
   // Incrementa rarità scelta
   dati[tipo][rar]++;
   datiAnnuali[tipo][rar]++;
+  console.log(`Aggiunto: ${rar}. Totale ora: ${dati[tipo][rar]}`);
 
-  // Reset conteggi mercy se è stata trovata la rarità superiore
+  // Gestione mercy: reset o incremento contatori senza rarità superiore
   if (rar === 'epico') {
     console.log('Reset senzaEpico');
     dati[tipo].senzaEpico = 0;
@@ -50,10 +51,13 @@ function add(rar) {
     dati[tipo].senzaMitico++;
   }
 
+  console.log(`Counters mercy: senzaEpico=${dati[tipo].senzaEpico}, senzaLeggendario=${dati[tipo].senzaLeggendario}, senzaMitico=${dati[tipo].senzaMitico}`);
+
   mostra();
   mostraAnnuale();
   salvaDati();
 }
+
 
 // Mostra i dati principali
 function mostra() {
