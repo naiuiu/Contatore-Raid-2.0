@@ -256,6 +256,7 @@ function resetRarita(tipo, rar) {
   mostra();
   mostraAnnuale();
   creaBottoniReset();
+  mostraMercyCountdown();
 }
 
 function aggiornaTotale(tipo) {
