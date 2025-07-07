@@ -1,4 +1,4 @@
-    const tipiScheggia = ['ancient', 'void', 'sacred', 'primal'];
+const tipiScheggia = ['ancient', 'void', 'sacred', 'primal'];
 const rarita = ['raro', 'epico', 'leggendario', 'mitico'];
 
 // Dati: totale conteggio e conteggio senza rarità specifica (per mercy)
@@ -56,8 +56,8 @@ function add(rar) {
   mostra();
   mostraAnnuale();
   salvaDati();
-  mostraMercyCountdown(); // chiamata aggiorna mercy
 }
+
 
 // Mostra i dati principali
 function mostra() {
@@ -92,29 +92,167 @@ function mostraAnnuale() {
   document.getElementById("output-annuale").textContent = out || "Nessun dato annuale.";
 }
 
-// Mostra countdown mercy
-function mostraMercyCountdown() {
-  let out = '';
-  tipiScheggia.forEach(tipo => {
-    const d = dati[tipo];
+// Calcola la percentuale
+function perc(val, tot) {
+  return tot === 0 ? "0.00" : ((val / tot) * 100).toFixed(2);
+}
 
+// Calcola mercy come percentuale in base al conteggio senza la rarità superiore
+function calcolaMercy(tipo, rarita) {
+  const d = dati[tipo];
+
+  if (rarita === 'epico') {
     if (tipo === 'ancient' || tipo === 'void') {
-      const rEpico = 20 - d.senzaEpico;
-      const rLegg = 200 - d.senzaLeggendario;
+      const count = d.senzaEpico;
+      if (count < 20) return '—';
+      return '+' + Math.min((count - 20) * 2, 100) + '%';
+    }
+    return '—';
+  }
+  if (rarita === 'leggendario') {
+    if (tipo === 'ancient' || tipo === 'void') {
+      const count = d.senzaLeggendario;
+      if (count < 200) return '—';
+      return '+' + Math.min((count - 200) * 5, 100) + '%';
+    }
+    if (tipo === 'sacred') {
+      const count = d.senzaLeggendario;
+      if (count < 12) return '—';
+      return '+' + Math.min((count - 12) * 2, 100) + '%';
+    }
+    if (tipo === 'primal') {
+      const count = d.senzaLeggendario;
+      if (count < 75) return '—';
+      return '+' + Math.min((count - 75) * 1, 100) + '%';
+    }
+    return '—';
+  }
+  if (rarita === 'mitico') {
+    if (tipo === 'primal') {
+      const count = d.senzaMitico;
+      if (count < 200) return '—';
+      return '+' + Math.min((count - 200) * 10, 100) + '%';
+    }
+    return '—';
+  }
 
-      out += `-- ${tipo.toUpperCase()} --\n`;
-      out += `Mercy Epico: ${d.senzaEpico}/20 → ${rEpico > 0 ? `${rEpico} evocazioni alla mercy` : 'Mercy attivo!'}\n`;
-      out += `Mercy Leggendario: ${d.senzaLeggendario}/200 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
+  return '—';
+}
 
-    } else if (tipo === 'sacred') {
-      const rLegg = 12 - d.senzaLeggendario;
-      out += `-- SACRED --\n`;
-      out += `Mercy Leggendario: ${d.senzaLeggendario}/12 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
+// Salva dati su localStorage
+function salvaDati() {
+  localStorage.setItem("raidDatiV3", JSON.stringify(dati));
+  localStorage.setItem("raidDatiAnnualiV3", JSON.stringify(datiAnnuali));
+}
 
-    } else if (tipo === 'primal') {
-      const rLegg = 75 - d.senzaLeggendario;
-      const rMitico = 200 - d.senzaMitico;
-      out += `-- PRIMAL --\n`;
-      out += `Mercy Leggendario: ${d.senzaLeggendario}/75 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n`;
-      out += `Mercy Mitico: ${d.senzaMitico}/200 → ${rMitico > 0 ? `${rMitico} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
-      
+// Carica dati da localStorage
+function caricaDati() {
+  const datiSalvati = localStorage.getItem("raidDatiV3");
+  const datiAnnualiSalvati = localStorage.getItem("raidDatiAnnualiV3");
+  if (datiSalvati) {
+    const obj = JSON.parse(datiSalvati);
+    tipiScheggia.forEach(tipo => {
+      rarita.forEach(r => {
+        dati[tipo][r] = obj[tipo]?.[r] || 0;
+      });
+      dati[tipo].totale = obj[tipo]?.totale || 0;
+      dati[tipo].senzaEpico = obj[tipo]?.senzaEpico || 0;
+      dati[tipo].senzaLeggendario = obj[tipo]?.senzaLeggendario || 0;
+      dati[tipo].senzaMitico = obj[tipo]?.senzaMitico || 0;
+    });
+  }
+  if (datiAnnualiSalvati) {
+    const obj = JSON.parse(datiAnnualiSalvati);
+    tipiScheggia.forEach(tipo => {
+      rarita.forEach(r => {
+        datiAnnuali[tipo][r] = obj[tipo]?.[r] || 0;
+      });
+      datiAnnuali[tipo].totale = obj[tipo]?.totale || 0;
+    });
+  }
+  mostra();
+  mostraAnnuale();
+  creaBottoniReset();
+}
+
+// Reset totale dati
+function resetta() {
+  if (confirm("Sei sicura di voler azzerare tutti i dati delle schegge?")) {
+    tipiScheggia.forEach(tipo => {
+      rarita.forEach(r => {
+        dati[tipo][r] = 0;
+        datiAnnuali[tipo][r] = 0;
+      });
+      dati[tipo].totale = 0;
+      datiAnnuali[tipo].totale = 0;
+      dati[tipo].senzaEpico = 0;
+      dati[tipo].senzaLeggendario = 0;
+      dati[tipo].senzaMitico = 0;
+    });
+    salvaDati();
+    mostra();
+    mostraAnnuale();
+    creaBottoniReset();
+  }
+}
+
+// Reset annuale
+function resetAnnuale() {
+  if (confirm("Sei sicura di voler azzerare il riepilogo annuale?")) {
+    tipiScheggia.forEach(tipo => {
+      rarita.forEach(r => {
+        datiAnnuali[tipo][r] = 0;
+      });
+      datiAnnuali[tipo].totale = 0;
+    });
+    salvaDati();
+    mostraAnnuale();
+  }
+}
+
+// Reset singolo per tipo e rarità
+function resetRarita(tipo, rar) {
+  dati[tipo][rar] = 0;
+  aggiornaTotale(tipo);
+  salvaDati();
+  mostra();
+  mostraAnnuale();
+  creaBottoniReset();
+}
+
+function aggiornaTotale(tipo) {
+  dati[tipo].totale = rarita.reduce((sum, r) => sum + dati[tipo][r], 0);
+}
+
+// Crea pulsanti reset per rarità singole
+function creaBottoniReset() {
+  const container = document.getElementById('reset-rarita-container');
+  container.innerHTML = '';
+
+  tipiScheggia.forEach(tipo => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+    div.style.textAlign = 'center';
+
+    const titolo = document.createElement('strong');
+    titolo.textContent = `Reset rarità per scheggia ${tipo.toUpperCase()}: `;
+    div.appendChild(titolo);
+
+    rarita.forEach(r => {
+      const btn = document.createElement('button');
+      btn.textContent = `Reset ${r}`;
+      btn.className = 'reset-rarita-btn';
+      btn.onclick = () => {
+        if (confirm(`Confermi il reset della rarità ${r} per la scheggia ${tipo.toUpperCase()}?`)) {
+          resetRarita(tipo, r);
+        }
+      };
+      div.appendChild(btn);
+    });
+
+    container.appendChild(div);
+  });
+}
+
+// Carica dati all'avvio
+window.onload = caricaDati;
