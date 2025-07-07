@@ -1,5 +1,7 @@
 const tipiScheggia = ['ancient', 'void', 'sacred', 'primal'];
 const rarita = ['raro', 'epico', 'leggendario', 'mitico'];
+const tipiScheggia = ['ancient', 'void', 'sacred', 'primal'];
+const rarita = ['raro', 'epico', 'leggendario', 'mitico'];
 
 // Dati: totale conteggio e conteggio senza rarità specifica (per mercy)
 const dati = {};
@@ -16,7 +18,7 @@ tipiScheggia.forEach(tipo => {
 });
 
 // Aggiunge una scheggia del tipo e rarità scelti
-function add(rar) {
+function add(rar){
   const tipo = document.getElementById("tipo").value;
   console.log(`Tentativo di aggiungere ${rar} per scheggia ${tipo}`);
 
@@ -56,6 +58,8 @@ function add(rar) {
   mostra();
   mostraAnnuale();
   salvaDati();
+  mostraMercyCountdown();
+
 }
 
 
@@ -203,6 +207,8 @@ function caricaDati() {
   mostra();
   mostraAnnuale();
   creaBottoniReset();
+  mostraMercyCountdown();
+  
 }
 
 // Reset totale dati
@@ -223,6 +229,8 @@ function resetta() {
     mostra();
     mostraAnnuale();
     creaBottoniReset();
+    mostraMercyCountdown();
+    
   }
 }
 
