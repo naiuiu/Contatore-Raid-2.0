@@ -91,6 +91,36 @@ function mostraAnnuale() {
   });
   document.getElementById("output-annuale").textContent = out || "Nessun dato annuale.";
 }
+// Mostra countdown mercy
+function mostraMercyCountdown() {
+  let out = '';
+  tipiScheggia.forEach(tipo => {
+    const d = dati[tipo];
+
+    if (tipo === 'ancient' || tipo === 'void') {
+      const rEpico = 20 - d.senzaEpico;
+      const rLegg = 200 - d.senzaLeggendario;
+
+      out += `-- ${tipo.toUpperCase()} --\n`;
+      out += `Mercy Epico: ${d.senzaEpico}/20 → ${rEpico > 0 ? `${rEpico} evocazioni alla mercy` : 'Mercy attivo!'}\n`;
+      out += `Mercy Leggendario: ${d.senzaLeggendario}/200 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
+
+    } else if (tipo === 'sacred') {
+      const rLegg = 12 - d.senzaLeggendario;
+      out += `-- SACRED --\n`;
+      out += `Mercy Leggendario: ${d.senzaLeggendario}/12 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
+
+    } else if (tipo === 'primal') {
+      const rLegg = 75 - d.senzaLeggendario;
+      const rMitico = 200 - d.senzaMitico;
+      out += `-- PRIMAL --\n`;
+      out += `Mercy Leggendario: ${d.senzaLeggendario}/75 → ${rLegg > 0 ? `${rLegg} evocazioni alla mercy` : 'Mercy attivo!'}\n`;
+      out += `Mercy Mitico: ${d.senzaMitico}/200 → ${rMitico > 0 ? `${rMitico} evocazioni alla mercy` : 'Mercy attivo!'}\n\n`;
+    }
+  });
+
+  document.getElementById('mercy-output').textContent = out || "Nessuna evocazione registrata.";
+}
 
 // Calcola la percentuale
 function perc(val, tot) {
